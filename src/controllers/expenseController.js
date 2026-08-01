@@ -52,6 +52,7 @@ function addExpense(req, res) {
 module.exports = {
   addExpense,
   getExpenses,
+  getExpenseTotal,
 };
 
 function getExpenses(req, res) {
@@ -67,6 +68,23 @@ function getExpenses(req, res) {
   } catch (error) {
     return res.status(500).json({
       message: "Unable to retrieve expenses",
+    });
+  }
+}
+
+function getExpenseTotal(req, res) {
+  try {
+    const { category } = req.query;
+
+    const total = expenseService.calculateTotalExpenses(category);
+
+    return res.status(200).json({
+      category: category ? category.trim() : "all",
+      total,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to calculate expense total",
     });
   }
 }
