@@ -1,72 +1,101 @@
 # AI Usage Notes
 
-## Development Log
+I used ChatGPT as a development assistant while building this assignment. It helped me plan the project structure, draft initial implementations, understand unfamiliar parts, review errors, and prepare tests and documentation.
 
-### Step 1: Project setup and Express server
+I did not rely on the generated code without validation. I integrated the suggested code into the project, ran it locally, manually tested the endpoints, fixed issues, and used automated tests to verify the final behaviour.
 
-#### AI-generated or AI-assisted
+## 1. Which parts were AI-generated vs. written or changed by me
 
-- AI recommended Node.js and Express because I already had experience with the MERN stack.
-- AI suggested separating the Express application into `app.js` and the server startup code into `server.js`.
-- AI provided the initial project structure, dependency list, and health-check endpoint example.
+### AI-generated or AI-assisted
 
-#### Completed and understood by me
+AI provided or helped draft:
 
-- I manually created the project folders and files.
-- I installed Express, Jest, Supertest, and Nodemon using npm.
-- I configured the npm scripts in `package.json`.
-- I added the Express JSON middleware and health-check endpoint.
-- I learned that `app.js` exports the Express application while `server.js` starts it on a port.
+- The initial Express project structure
+- The separation of `app.js` and `server.js`
+- The Route → Controller → Service architecture
+- Initial code drafts for the expense routes, controller, and service
+- JSON-file reading and writing using Node.js `fs`
+- Input-validation suggestions
+- The initial Jest and Supertest test-suite structure
+- README and AI_NOTES organization
+- Debugging suggestions based on error messages and test failures
 
-#### Validation performed by me
+### Completed, configured, or changed by me
 
-- I used `npm list --depth=0` to confirm that all required packages were installed.
-- I started the server using `npm start`.
-- I opened the root endpoint in the browser and verified the JSON response.
-- I checked that npm reported zero known vulnerabilities during installation.
+I personally:
 
-### Step 2: Add expense endpoint
+- Created the project folders and files
+- Initialized the npm project and installed the dependencies
+- Configured the npm scripts
+- Chose Node.js and Express based on my previous MERN-stack experience
+- Connected the routes, controllers, services, and JSON storage
+- Added minimum title-length validation
+- Added case-insensitive category normalization using `trim()` and `toLowerCase()`
+- Added the matching-expense `count` to list and total responses
+- Refactored the totals controller to reuse one filtered expense array
+- Ran all manual API requests and automated tests
+- Diagnosed and fixed runtime and test failures
+- Managed the Git commits and pushed the completed work to GitHub
 
-#### AI-generated or AI-assisted
+## 2. What I validated, tested, or changed in the AI output, and why
 
-- AI suggested separating file-storage logic into a service and HTTP request handling into a controller.
-- AI provided an initial implementation for reading and writing expenses using Node.js `fs`.
-- AI suggested generating a new ID using the highest existing ID plus one.
+### Input validation
 
-#### Written or changed by me
+I verified that the API rejects:
 
-- I manually added minimum-title-length validation.
-- I retained strict numeric validation so that string values such as `"250"` are not silently accepted.
-- I used a JSON file instead of in-memory storage so expenses remain available after restarting the server.
+- Missing required fields
+- Titles shorter than two characters
+- Zero or negative amounts
+- Amounts that are not JSON numbers
+- Invalid dates or dates not using `YYYY-MM-DD`
+- Invalid or non-positive expense IDs
 
-#### Validation performed by me
+Strict validation prevents invalid expense records from being stored.
 
-- I sent a valid POST request and verified the `201 Created` response.
-- I checked that the new expense was written to `src/data/expenses.json`.
-- I sent an invalid request with a negative amount and verified that the API returned a `400` response.
-- I reviewed the ID-generation logic and confirmed that it avoids duplicate IDs after an expense is deleted.
+### Category filtering
 
-### Step 3: View and filter expenses
+I normalized category values using `trim()` and `toLowerCase()`.
 
-#### AI-generated or AI-assisted
+This makes category matching case-insensitive, so values such as `Food`, `food`, and `FOOD` return the same matching expenses.
 
-- AI suggested using a query parameter for category filtering.
-- AI suggested keeping filtering logic inside the service layer.
-- AI provided the initial GET endpoint structure.
+### Expense ID generation
 
-#### Written or changed by me
+The new ID is calculated using the highest existing ID plus one instead of using the array length.
 
-- I manually normalized the category query using `trim()` and `toLowerCase()`.
-- I kept category matching case-insensitive to make the API easier to use.
-- I added a `count` field to the response so clients can quickly see how many expenses matched.
+This prevents duplicate IDs when an expense has previously been deleted.
 
-#### Validation performed by me
+### Manual API testing
 
-- I retrieved all expenses using `GET /expenses`.
-- I tested filtering with `GET /expenses?category=Food`.
-- I tested lowercase filtering with `category=food`.
-- I verified that an unknown category returned an empty array instead of an error.
-- While implementing category filtering, I accidentally placed the category-normalization statement outside the service function. This caused a `ReferenceError` and prevented the server from starting.
-- I used the stack trace to locate the faulty line, moved it inside `getAllExpenses`, restarted the server, and retested the endpoint.
-- My first totals implementation returned the total but omitted the matching expense count. The automated tests caught this because `response.body.count` was undefined.
-- I updated the controller to retrieve the filtered expenses once, then used the same array for both `count` and `total`. This also avoided reading the JSON file twice.
+I manually tested:
+
+- Creating a valid expense
+- Rejecting a negative amount
+- Viewing all expenses
+- Filtering by category
+- Filtering using different letter cases
+- Calculating the overall total
+- Calculating a category-specific total
+- Deleting an existing expense
+- Deleting a missing expense
+- Rejecting an invalid expense ID
+
+I also checked that expenses were written to the local JSON file.
+
+### Debugging and changes
+
+While implementing category filtering, I accidentally placed the category-normalization statement outside the service function. This caused a `ReferenceError` and prevented the server from starting. I used the stack trace to identify the faulty line, moved it inside `getAllExpenses`, restarted the server, and tested the endpoint again.
+
+The delete endpoint initially returned `Cannot DELETE /expenses/2`. I determined that the running Node process had not reloaded the newly added route. After restarting the server, I verified that deletion worked correctly.
+
+My first totals response returned the total but did not include the matching expense count. The automated test reported that `response.body.count` was `undefined`. I updated the controller to retrieve the filtered expenses once and use the same array for both `count` and `total`. This also avoided an unnecessary second file read.
+
+The final Jest and Supertest suite contains 10 tests, and all 10 tests pass.
+
+## 3. AI suggestions I decided not to use, and why
+
+- AI initially suggested FastAPI because it provides automatic Swagger documentation. I selected Node.js and Express instead because it matches my existing MERN-stack experience and I can understand and explain the implementation more confidently.
+- AI suggested considering Swagger/OpenAPI as an optional bonus if enough time remained. I decided not to add it because the bonus was not required, and I prioritized completing all required endpoints, validation, automated tests, documentation, and final verification before the deadline.
+
+## Final result
+
+AI accelerated the initial implementation and review process, but I manually ran, tested, debugged, and validated the final application before submission.
