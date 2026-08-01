@@ -57,10 +57,29 @@ function calculateTotalExpenses(category) {
   );
 }
 
+function deleteExpenseById(id) {
+  const expenses = readExpenses();
+
+  const expenseIndex = expenses.findIndex(
+    (expense) => expense.id === id
+  );
+
+  if (expenseIndex === -1) {
+    return null;
+  }
+
+  const deletedExpense = expenses.splice(expenseIndex, 1)[0];
+
+  writeExpenses(expenses);
+
+  return deletedExpense;
+}
+
 module.exports = {
   readExpenses,
   writeExpenses,
   createExpense,
   getAllExpenses,
   calculateTotalExpenses,
+  deleteExpenseById,
 };

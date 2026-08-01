@@ -49,12 +49,6 @@ function addExpense(req, res) {
   }
 }
 
-module.exports = {
-  addExpense,
-  getExpenses,
-  getExpenseTotal,
-};
-
 function getExpenses(req, res) {
   try {
     const { category } = req.query;
@@ -88,3 +82,40 @@ function getExpenseTotal(req, res) {
     });
   }
 }
+
+function deleteExpense(req, res) {
+  try {
+    const expenseId = Number(req.params.id);
+
+    if (!Number.isInteger(expenseId) || expenseId <= 0) {
+      return res.status(400).json({
+        message: "Expense ID must be a positive integer",
+      });
+    }
+
+    const deletedExpense =
+      expenseService.deleteExpenseById(expenseId);
+
+    if (!deletedExpense) {
+      return res.status(404).json({
+        message: "Expense not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Expense deleted successfully",
+      expense: deletedExpense,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Unable to delete expense",
+    });
+  }
+}
+
+module.exports = {
+  addExpense,
+  getExpenses,
+  getExpenseTotal,
+  deleteExpense,
+};

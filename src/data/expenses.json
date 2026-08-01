@@ -5,12 +5,5 @@
     "amount": 250,
     "category": "Food",
     "date": "2026-08-01"
-  },
-  {
-    "id": 2,
-    "title": "Bus ticket",
-    "amount": 80,
-    "category": "Travel",
-    "date": "2026-08-01"
   }
 ]
