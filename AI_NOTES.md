@@ -1,8 +1,8 @@
 # AI Usage Notes
 
-I used ChatGPT as a development assistant while building this assignment. It helped me plan the project structure, draft initial implementations, understand unfamiliar parts, review errors, and prepare tests and documentation.
+I used ChatGPT as a development assistant while building this assignment. It helped me plan the project structure, draft initial implementations, understand unfamiliar parts, review errors, strengthen input validation, and prepare tests and documentation.
 
-I did not rely on the generated code without validation. I integrated the suggested code into the project, ran it locally, manually tested the endpoints, fixed issues, and used automated tests to verify the final behaviour.
+I did not use the generated code without validation. I integrated the suggested code into the project, ran it locally, manually tested the endpoints, fixed issues, and used automated tests to verify the final behaviour.
 
 ## 1. Which parts were AI-generated vs. written or changed by me
 
@@ -16,9 +16,11 @@ AI provided or helped draft:
 - Initial code drafts for the expense routes, controller, and service
 - JSON-file reading and writing using Node.js `fs`
 - Input-validation suggestions
+- The real-calendar-date validation helper
 - The initial Jest and Supertest test-suite structure
+- Additional tests for missing and invalid request data
 - README and AI_NOTES organization
-- Debugging suggestions based on error messages and test failures
+- Debugging suggestions based on runtime errors and test failures
 
 ### Completed, configured, or changed by me
 
@@ -35,22 +37,25 @@ I personally:
 - Refactored the totals controller to reuse one filtered expense array
 - Ran all manual API requests and automated tests
 - Diagnosed and fixed runtime and test failures
+- Verified the project from a fresh GitHub clone
 - Managed the Git commits and pushed the completed work to GitHub
 
 ## 2. What I validated, tested, or changed in the AI output, and why
 
 ### Input validation
 
-I verified that the API rejects:
+I reviewed and verified validation for:
 
 - Missing required fields
-- Titles shorter than two characters
+- Blank or too-short titles
 - Zero or negative amounts
-- Amounts that are not JSON numbers
-- Invalid dates or dates not using `YYYY-MM-DD`
+- Amounts supplied as strings instead of JSON numbers
+- Blank categories
+- Invalid date formats
+- Impossible calendar dates
 - Invalid or non-positive expense IDs
 
-Strict validation prevents invalid expense records from being stored.
+Strict validation prevents malformed expense records from being stored.
 
 ### Category filtering
 
@@ -79,7 +84,7 @@ I manually tested:
 - Deleting a missing expense
 - Rejecting an invalid expense ID
 
-I also checked that expenses were written to the local JSON file.
+I also verified that expenses were written to the local JSON file.
 
 ### Debugging and changes
 
@@ -89,7 +94,9 @@ The delete endpoint initially returned `Cannot DELETE /expenses/2`. I determined
 
 My first totals response returned the total but did not include the matching expense count. The automated test reported that `response.body.count` was `undefined`. I updated the controller to retrieve the filtered expenses once and use the same array for both `count` and `total`. This also avoided an unnecessary second file read.
 
-The final Jest and Supertest suite contains 10 tests, and all 10 tests pass.
+During final review, I noticed that the documentation claimed minimum title validation, but the controller did not fully reject whitespace-only titles. I strengthened the controller validation and added automated tests for blank titles, blank categories, string amounts, missing fields, and impossible calendar dates.
+
+The final Jest and Supertest suite contains 15 tests, and all 15 tests pass.
 
 ## 3. AI suggestions I decided not to use, and why
 

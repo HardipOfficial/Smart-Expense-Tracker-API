@@ -1,12 +1,46 @@
 const expenseService = require("../services/expenseService");
 
+function isValidDate(date) {
+  if (
+    typeof date !== "string" ||
+    !/^\d{4}-\d{2}-\d{2}$/.test(date)
+  ) {
+    return false;
+  }
+
+  const parsedDate = new Date(`${date}T00:00:00.000Z`);
+
+  return (
+    !Number.isNaN(parsedDate.getTime()) &&
+    parsedDate.toISOString().slice(0, 10) === date
+  );
+}
+
 function addExpense(req, res) {
   try {
     const { title, amount, category, date } = req.body;
 
-    if (!title || amount === undefined || !category || !date) {
+    if (
+      title === undefined ||
+      title === null ||
+      amount === undefined ||
+      amount === null ||
+      category === undefined ||
+      category === null ||
+      date === undefined ||
+      date === null
+    ) {
       return res.status(400).json({
         message: "Title, amount, category, and date are required",
+      });
+    }
+
+    if (
+      typeof title !== "string" ||
+      title.trim().length < 2
+    ) {
+      return res.status(400).json({
+        message: "Title must contain at least 2 characters",
       });
     }
 
@@ -20,12 +54,16 @@ function addExpense(req, res) {
       });
     }
 
-    const parsedDate = new Date(date);
-
     if (
-      Number.isNaN(parsedDate.getTime()) ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(date)
+      typeof category !== "string" ||
+      category.trim().length === 0
     ) {
+      return res.status(400).json({
+        message: "Category must not be empty",
+      });
+    }
+
+    if (!isValidDate(date)) {
       return res.status(400).json({
         message: "Date must be valid and use YYYY-MM-DD format",
       });
@@ -71,6 +109,7 @@ function getExpenseTotal(req, res) {
     const { category } = req.query;
 
     const expenses = expenseService.getAllExpenses(category);
+
     const total = expenses.reduce(
       (sum, expense) => sum + expense.amount,
       0

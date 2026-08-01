@@ -53,6 +53,37 @@ describe("Smart Expense Tracker API", () => {
     expect(response.body.expense.id).toBe(1);
   });
 
+  test("POST /expenses should reject missing required fields", async () => {
+    const response = await request(app)
+      .post("/expenses")
+      .send({
+        title: "Lunch",
+        amount: 250,
+        date: "2026-08-01",
+      });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe(
+      "Title, amount, category, and date are required"
+    );
+  });
+
+  test("POST /expenses should reject a blank title", async () => {
+    const response = await request(app)
+      .post("/expenses")
+      .send({
+        title: " ",
+        amount: 100,
+        category: "Food",
+        date: "2026-08-01",
+      });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe(
+      "Title must contain at least 2 characters"
+    );
+  });
+
   test("POST /expenses should reject a negative amount", async () => {
     const response = await request(app)
       .post("/expenses")
@@ -66,6 +97,54 @@ describe("Smart Expense Tracker API", () => {
     expect(response.statusCode).toBe(400);
     expect(response.body.message).toBe(
       "Amount must be a positive number"
+    );
+  });
+
+  test("POST /expenses should reject a string amount", async () => {
+    const response = await request(app)
+      .post("/expenses")
+      .send({
+        title: "Coffee",
+        amount: "50",
+        category: "Food",
+        date: "2026-08-01",
+      });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe(
+      "Amount must be a positive number"
+    );
+  });
+
+  test("POST /expenses should reject a blank category", async () => {
+    const response = await request(app)
+      .post("/expenses")
+      .send({
+        title: "Lunch",
+        amount: 100,
+        category: " ",
+        date: "2026-08-01",
+      });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe(
+      "Category must not be empty"
+    );
+  });
+
+  test("POST /expenses should reject an invalid calendar date", async () => {
+    const response = await request(app)
+      .post("/expenses")
+      .send({
+        title: "Lunch",
+        amount: 100,
+        category: "Food",
+        date: "2026-02-31",
+      });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe(
+      "Date must be valid and use YYYY-MM-DD format"
     );
   });
 
@@ -158,6 +237,7 @@ describe("Smart Expense Tracker API", () => {
       .query({ category: "food" });
 
     expect(response.statusCode).toBe(200);
+    expect(response.body.category).toBe("food");
     expect(response.body.count).toBe(2);
     expect(response.body.total).toBe(300);
   });

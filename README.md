@@ -104,7 +104,7 @@ Expected result:
 
 ```text
 Test Suites: 1 passed, 1 total
-Tests:       10 passed, 10 total
+Tests:       15 passed, 15 total
 ```
 
 ## API Endpoints
@@ -167,7 +167,7 @@ GET /expenses
 GET /expenses?category=Food
 ```
 
-Category matching is case-insensitive, so `Food`, `food`, and `FOOD` return the same category results.
+Category matching is case-insensitive, so `Food`, `food`, and `FOOD` return the same results.
 
 ### Calculate Overall Total
 
@@ -216,10 +216,11 @@ Example response:
 
 The API validates that:
 
-- `title` is present and has at least two characters
-- `amount` is a positive number
-- `category` is present
-- `date` is valid and uses `YYYY-MM-DD`
+- All required fields are present
+- `title` is a string containing at least two characters
+- `amount` is a positive JSON number
+- `category` is a non-empty string
+- `date` uses `YYYY-MM-DD` and represents a real calendar date
 - Expense IDs are positive integers
 
 ## HTTP Status Codes
@@ -246,7 +247,12 @@ The Jest and Supertest suite covers:
 
 - Health-check endpoint
 - Creating an expense
+- Missing required fields
+- Blank title rejection
 - Negative amount rejection
+- String amount rejection
+- Blank category rejection
+- Invalid calendar date rejection
 - Viewing all expenses
 - Case-insensitive category filtering
 - Overall total calculation
