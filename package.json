@@ -1,13 +1,20 @@
 {
   "name": "smart-expense-tracker-api",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A REST API for managing personal expenses",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --runInBand"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "expense-tracker",
+    "rest-api",
+    "nodejs",
+    "express"
+  ],
+  "author": "Hardipsinh Rathod",
   "license": "ISC",
   "dependencies": {
     "express": "^5.2.1"
