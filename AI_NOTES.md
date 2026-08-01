@@ -66,3 +66,7 @@
 - I tested filtering with `GET /expenses?category=Food`.
 - I tested lowercase filtering with `category=food`.
 - I verified that an unknown category returned an empty array instead of an error.
+- While implementing category filtering, I accidentally placed the category-normalization statement outside the service function. This caused a `ReferenceError` and prevented the server from starting.
+- I used the stack trace to locate the faulty line, moved it inside `getAllExpenses`, restarted the server, and retested the endpoint.
+- My first totals implementation returned the total but omitted the matching expense count. The automated tests caught this because `response.body.count` was undefined.
+- I updated the controller to retrieve the filtered expenses once, then used the same array for both `count` and `total`. This also avoided reading the JSON file twice.

@@ -70,10 +70,15 @@ function getExpenseTotal(req, res) {
   try {
     const { category } = req.query;
 
-    const total = expenseService.calculateTotalExpenses(category);
+    const expenses = expenseService.getAllExpenses(category);
+    const total = expenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
 
     return res.status(200).json({
       category: category ? category.trim() : "all",
+      count: expenses.length,
       total,
     });
   } catch (error) {
